@@ -46,7 +46,7 @@ const WaveAnimation = React.memo(() => {
     const interval = setInterval(() => {
       setWaveParams({
         height: Math.random() * 20 + 10,
-        frequency: Math.random() * 2 + 1
+        frequency: Math.random() * 2 + 1,
       });
     }, 1000);
 
@@ -135,28 +135,7 @@ const AudioRecorder = () => {
       }
     };
   }, []);
-  
-  // useEffect(() => {
-  //   let timer: NodeJS.Timeout;
-  //   if (countdown !== null && countdown > 0) {
-  //     timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-  //   } else if (countdown === 0) {
-  //     setTimeout(() => {
-  //       if (mediaRecorderRef.current) {
-  //         mediaRecorderRef?.current?.start();
-  //         updateState({
-  //           status: "recording",
-  //           isRecording: true,
-  //           waveformAnimation: true,
-  //           showShades:false
-  //         });
-  //       }
-  //     }, 3000)
-  //   }
-  //   return () => {
-  //     if (timer) clearTimeout(timer);
-  //   };
-  // }, [countdown, updateState]);
+
   // ScatteredDots component for background visual effect
   const ScatteredDots = React.memo(() => {
     const dots = useMemo(
@@ -189,19 +168,21 @@ const AudioRecorder = () => {
       };
 
       mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
         const audioUrl = URL.createObjectURL(audioBlob);
         updateState({
           audioUrl,
-          status: 'stopped',
+          status: "stopped",
           showControls: true,
           isRecording: false,
           waveformAnimation: false, // Stop waveform animation when recording stops
-        })
+        });
       };
       // Countdown logic
       updateState({
-        bgColor: '#2F4858', // Change background to dark
+        bgColor: "#2F4858", // Change background to dark
         showShades: true,
       });
       setCountdown(3);
@@ -214,11 +195,14 @@ const AudioRecorder = () => {
             setCountdown(null);
             updateState({
               showShades: false,
-              status: 'recording',
+              status: "recording",
               isRecording: true,
               waveformAnimation: true, // Start waveform animation when recording starts
-            })
-            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'recording') {
+            });
+            if (
+              mediaRecorderRef.current &&
+              mediaRecorderRef.current.state !== "recording"
+            ) {
               mediaRecorderRef.current.start();
             }
             return null;
@@ -226,14 +210,10 @@ const AudioRecorder = () => {
         });
       }, 1000);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      console.error("Error accessing microphone:", error);
     }
-  }, [countdown,updateState]);
-  
-  
-  
-  
-  
+  }, [countdown, updateState]);
+
   // Function to stop the recording
   const stopRecording = useCallback(() => {
     setCountdown(null);
@@ -301,7 +281,12 @@ const AudioRecorder = () => {
           <BabbleLogo size={60} />
         </div>
       ),
-    [memoizedState.status, memoizedState.isRecording, memoizedState.showControls, countdown]
+    [
+      memoizedState.status,
+      memoizedState.isRecording,
+      memoizedState.showControls,
+      countdown,
+    ]
   );
   // Main render function
   return (
@@ -407,8 +392,7 @@ const AudioRecorder = () => {
                   <animated.button
                     style={{
                       ...buttonAnimation,
-                      backgroundColor:
-                        countdown !== null ? "white" : "#2F4858",
+                      backgroundColor: countdown !== null ? "white" : "#2F4858",
                       color: countdown !== null ? "#2F4858" : "#FFB684",
                       border:
                         countdown === null
@@ -420,8 +404,7 @@ const AudioRecorder = () => {
                     onClick={startRecording}
                   >
                     <span className="relative z-10">
-                      {countdown === null && "Babble"}
-                      {countdown !== null && countdown}
+                      {countdown !== null ? countdown : "Babble"}
                     </span>
                     {countdown === null && (
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -480,7 +463,8 @@ const AudioRecorder = () => {
                     }}
                     className="w-64 h-64 rounded-full text-xl focus:outline-none transition-all duration-300 flex items-center justify-center z-10 border-2 border-[#FFB684] relative overflow-hidden group"
                     onClick={() =>
-                      memoizedState.audioUrl && new Audio(memoizedState.audioUrl).play()
+                      memoizedState.audioUrl &&
+                      new Audio(memoizedState.audioUrl).play()
                     }
                   >
                     <span className="relative z-10 transition-colors duration-300 group-hover:text-[#FFB684]">
