@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSpring, animated } from '@react-spring/web';
-import { FaStop, FaTrash, FaPlay } from 'react-icons/fa';
+import {  FaTrash } from 'react-icons/fa';
 import { VectorIcon, ThreeCirclesIcon } from '@/components/Icons'; // You'll need to create these components
 import BabbleLogo from '@/components/BableLogo';
 
@@ -147,6 +147,8 @@ const AudioRecorder = () => {
   };
 
   const stopRecording = () => {
+    setIsRecording(false);
+    setWaveformAnimation(false); // Stop waveform animation when recording stops   
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
@@ -155,19 +157,14 @@ const AudioRecorder = () => {
     setIsRecording(false);
   };
   const resumeRecording = useCallback(() => {
+    setIsRecording(true);
+    setWaveformAnimation(true); 
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'inactive') {
       mediaRecorderRef.current.start();
-      setIsRecording(true);
       setStatus('recording');
     }
   }, []);
-  const finishRecording = useCallback(() => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-      mediaRecorderRef.current = null;
-    }
-    setStatus('idle');
-  }, []);
+  
   const deleteRecording = () => {
     setAudioUrl(null);
     setStatus('idle');
@@ -190,7 +187,7 @@ const AudioRecorder = () => {
       </div></>)}
       <Container showBorder={!isRecording && !showControls && countdown===null && status === 'idle'}>
     {/* <div className="w-[90%] h-[79vh] border border-white border-opacity-100 rounded-3xl flex items-center justify-center" style={{border:'0.5px solid rgba(255, 255, 255, 0.5)'}}> */}
-    {!isRecording && !showControls && countdown===null && (<><div className="group absolute bottom-[9%] left-[54.5%] w-16 h-16 bg-[#2F4858] rounded-full transform -translate-x-[10rem] translate-y-1/2 border border-black border-opacity-50 transition-colors duration-300 hover:bg-[#FFB684] hover:border-black">
+    {status === 'idle' && !isRecording && !showControls && countdown===null && (<><div className="group absolute bottom-[9%] left-[54.5%] w-16 h-16 bg-[#2F4858] rounded-full transform -translate-x-[10rem] translate-y-1/2 border border-black border-opacity-50 transition-colors duration-300 hover:bg-[#FFB684] hover:border-black">
       <div style={{position: 'relative',
     right: '-7px',
     top: "12px"}}
@@ -314,7 +311,7 @@ const AudioRecorder = () => {
               border: '1px black solid',
             }}
             className="w-64 h-64 rounded-full text-xl focus:outline-none transition-all duration-300 flex items-center justify-center z-10 border-2 border-[#FFB684] relative overflow-hidden group"
-            onClick={finishRecording}
+            onClick={() => audioUrl && new Audio(audioUrl).play()}
           >
             <span className="relative z-10 transition-colors duration-300 group-hover:text-[#FFB684]">
               Done
